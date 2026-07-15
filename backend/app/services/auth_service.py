@@ -28,13 +28,29 @@ def register_user(db: Session, name: str, email: str, password: str):
 
 
 def login_user(db: Session, email: str, password: str):
+    print("=" * 50)
+    print("Email:", email)
+    print("Password:", password)
+
     user = db.query(User).filter(User.email == email).first()
 
+    print("User:", user)
+
     if not user:
+        print("❌ User not found")
         return None
 
-    if not verify_password(password, user.password):
+    print("Stored hash:", user.password)
+
+    result = verify_password(password, user.password)
+
+    print("Password Match:", result)
+
+    if not result:
+        print("❌ Password mismatch")
         return None
+
+    print("✅ Login Successful")
 
     token = create_access_token(
         data={"sub": user.email}
@@ -42,5 +58,5 @@ def login_user(db: Session, email: str, password: str):
 
     return {
         "access_token": token,
-        "token_type": "bearer"
+        "token_type": "bearer",
     }
